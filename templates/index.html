@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limbus Company Prescript Interface</title>
+    <style>
+        :root {
+            --bg-color: #0c0d10;
+            --accent-red: #0563a1;
+            --text-gold: #2993c4;
+            --text-main: #1b76cc;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Subtle looping background scanline animation */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 600px;
+            border-left: 4px solid var(--accent-red);
+            padding: 20px 40px;
+            background: rgba(20, 20, 25, 0.8);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .header {
+            font-size: 0.8rem;
+            color: var(--accent-red);
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .text-box {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            min-height: 120px;
+            letter-spacing: 1px;
+        }
+
+        /* Blinking terminal cursor */
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.3rem;
+            background-color: var(--text-gold);
+            margin-left: 5px;
+            animation: blink 0.8s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 0.75rem;
+            color: #666;
+            text-align: right;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">City Prescript // Index</div>
+        <div class="text-box">
+            <span id="prescript-text"></span><span class="cursor"></span>
+        </div>
+        <div class="footer">Press ANY KEY to receive next order...</div>
+    </div>
+
+    <script>
+        // Array of your looping prescript orders
+        const orders = [
+            "iko pergi ke cfd dan foto kajiban apa yg ada di sana.",
+            "no comends, no questions, just follow the orders.",
+            
+        
+            
+        ];
+
+        let currentOrderIndex = 0;
+        let currentCharIndex = 0;
+        let isTyping = false;
+        let typingTimer;
+        
+        const speed = 40; // Typing speed in milliseconds per character
+        const textElement = document.getElementById("prescript-text");
+
+        function typeWriter() {
+            const currentText = orders[currentOrderIndex];
+            
+            if (currentCharIndex < currentText.length) {
+                isTyping = true;
+                textElement.textContent += currentText.charAt(currentCharIndex);
+                currentCharIndex++;
+                typingTimer = setTimeout(typeWriter, speed);
+            } else {
+                isTyping = false;
+            }
+        }
+
+        function triggerNextOrder() {
+            // If it is currently typing, finish the text instantly (skip typing animation)
+            if (isTyping) {
+                clearTimeout(typingTimer);
+                textElement.textContent = orders[currentOrderIndex];
+                isTyping = false;
+                currentCharIndex = orders[currentOrderIndex].length;
+                return;
+            }
+
+            // Move to next order or loop back to the first one
+            currentOrderIndex = (currentOrderIndex + 1) % orders.length;
+            
+            // Reset text box and start typing next order smoothly
+            textElement.textContent = "";
+            currentCharIndex = 0;
+            typeWriter();
+        }
+
+        // Listen for any keypress to trigger next order
+        window.addEventListener("keydown", triggerNextOrder);
+        
+        // Also listen for a screen click/tap for mouse users/mobile
+        window.addEventListener("click", triggerNextOrder);
+
+        // Initialize the first order on load
+        typeWriter();
+    </script>
+
+</body>
+</html>
